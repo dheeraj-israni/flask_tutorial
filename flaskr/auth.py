@@ -8,7 +8,7 @@ from flaskr.db import get_db
 
 bp = Blueprint('auth', __name__, url_prefix = '/auth')
 
-@bp.route('/register', methods = (GET, POST))
+@bp.route('/register', methods = ('GET', 'POST'))
 def register():
     if request.method == "POST":
         username = request.form['username']
@@ -23,7 +23,7 @@ def register():
         elif db.execute(
             'SELECT id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
-            error = f"User is {username} is already registered."
+            error = f"User {username} is already registered."
 
         if error is None:
             db.execute(
@@ -31,14 +31,14 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
-            redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login'))
 
         flash(error)
 
     return render_template('auth/register.html')
 
 
-@bp.route('/login', methods = (GET, POST))
+@bp.route('/login', methods = ('GET', 'POST'))
 def login():
     if request.method == "POST":
         username = request.form['username']
@@ -46,7 +46,7 @@ def login():
         db = get_db()
         error = None
         user = db.execute(
-            'SELECT * FROM user WHERE username = ?'
+            'SELECT * FROM user WHERE username = ?',
             (username,)
         ).fetchone()
 
